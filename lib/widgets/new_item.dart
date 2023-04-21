@@ -20,30 +20,34 @@ class _newItemScreenState extends State<newItemScreen> {
   var _enteredName = '';
   var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.vegetables]!;
-  void _saveItem() {
+  Future<void> _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
         final url = Uri.https(
             'shopping-list-b8104-default-rtdb.asia-southeast1.firebasedatabase.app',
             'shopping-list.json');
-        http.post(url,
+        final res = await http.post(url,
             headers: {'Content-Type': 'application/json'},
             body: json.encode({
               'name': _enteredName,
               'quantity': _enteredQuantity,
               'category': _selectedCategory.title
             }));
-        print("Completed processing");
+        print(res.body);
+        if (!context.mounted) {
+          return;
+        }
+        Navigator.of(context).pop();
       } catch (err) {
         print(err);
       }
 
-      Navigator.of(context).pop(GroceryItem(
-          id: DateTime.now().toString(),
-          name: _enteredName,
-          quantity: _enteredQuantity,
-          category: _selectedCategory));
+      // Navigator.of(context).pop(GroceryItem(
+      //     id: DateTime.now().toString(),
+      //     name: _enteredName,
+      //     quantity: _enteredQuantity,
+      //     category: _selectedCategory));
     }
     ;
   }
