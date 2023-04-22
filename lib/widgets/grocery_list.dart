@@ -29,6 +29,7 @@ class _GroceryListState extends State<GroceryList> {
     final url = Uri.https(
         'shopping-list-b8104-default-rtdb.asia-southeast1.firebasedatabase.app',
         'shopping-list.json');
+
     final res = await http.get(url);
     if (res.statusCode >= 400) {
       setState(() {
@@ -65,10 +66,21 @@ class _GroceryListState extends State<GroceryList> {
     });
   }
 
-  void _removeItem(GroceryItem item) {
+  Future<void> _removeItem(GroceryItem item) async {
+    final index = _groceryItems.indexOf(item);
     setState(() {
       _groceryItems.remove(item);
     });
+    final url = Uri.https(
+        'shopping-list-b8104-default-rtdb.asia-southeast1.firebasedatabase.app',
+        'shopping-list/${item.id}.json');
+
+    final res = await http.delete(url);
+    if (res.statusCode >= 400) {
+      setState(() {
+        _groceryItems.insert(index, item);
+      });
+    }
   }
 
   @override
